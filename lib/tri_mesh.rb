@@ -8,6 +8,14 @@ module GMath3D
     attr_reader :vertices
     attr_reader :tri_indices
 
+    attr_reader :center #a Vector3 to CenterPoint
+    attr_reader :min_x  #min and maxs are Floats
+    attr_reader :min_y
+    attr_reader :min_z
+    attr_reader :max_x
+    attr_reader :max_y
+    attr_reader :max_z
+
     include BoxAvailable
 
     # [Input]
@@ -31,6 +39,8 @@ module GMath3D
       super()
       @vertices = vertices
       @tri_indices = tri_indices
+
+      @center = calc_properties
     end
 
     def initialize_copy( original_obj )
@@ -251,6 +261,31 @@ module GMath3D
         normals_map[vertex] = normal.normalize
       end
       return  normals_map
+    end
+
+  private
+    #Returns the Center Point of the TriMesh as Vector3
+    #Should be calculated in Constructor
+    #Stored in class attribut :center
+    def calc_properties
+      min_x = max_x = @vertices[0].x
+      min_y = max_y = @vertices[0].y
+      min_z = max_z = @vertices[0].z
+      @vertices.each do | vec |
+        min_x = [vec.x, min_x].min
+        min_y = [vec.y, min_y].min
+        min_z = [vec.z, min_z].min
+        max_x = [vec.x, max_x].max
+        max_y = [vec.y, max_y].max
+        max_z = [vec.z, max_z].max
+      end
+      @min_x = min_x
+      @min_y = min_y
+      @min_z = min_z
+      @max_x = max_x
+      @max_y = max_y
+      @max_z = max_z
+      return (((Vector3.new min_x, min_y, min_z) + (Vector3.new max_x, max_y, max_z)) * 0.5)
     end
 
   end
